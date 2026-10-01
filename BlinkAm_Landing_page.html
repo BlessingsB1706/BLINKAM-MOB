@@ -15,9 +15,10 @@
     <meta name="apple-mobile-web-app-title" content="BlinkAm">
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" type="image/jpg" href="/icon-192.jpg">
-    <link rel="apple-touch-icon" href="/icon-192.jpg">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="pwa.js" defer></script>
     <style>
         :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; --neon-amber: #ffaa00; }
         body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
@@ -42,30 +43,33 @@
 </head>
 <body>
 
-    <nav class="fixed top-0 w-full p-5 flex justify-between items-center z-50 glass border-b border-white/5">
+    <nav class="fixed top-0 w-full px-4 py-4 sm:p-5 flex justify-between items-center gap-3 z-50 glass border-b border-white/5">
         <div class="text-xl font-black italic">BLINK<span class="neon-text">AM</span></div>
         <div class="hidden md:flex space-x-6 text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
             <a href="#retina" class="hover:text-[#00ffa2]">Retina Feed</a>
             <a href="#vault" class="hover:text-[#00ffa2]">The Vault</a>
             <a href="#support" class="hover:text-[#00ffa2]">Support</a>
         </div>
-        <button class="px-5 py-2 rounded-full border border-white/20 text-xs font-bold hover:bg-white/10 transition">LOGIN</button>
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <a href="log.html" class="px-4 sm:px-5 py-2 rounded-full border border-white/20 text-[11px] sm:text-xs font-bold hover:bg-white/10 transition">LOGIN</a>
+            <a href="register.html" class="px-4 sm:px-5 py-2 rounded-full bg-[#00ffa2] text-[#0b0e14] text-[11px] sm:text-xs font-black shadow-[0_0_15px_rgba(0,255,162,0.35)] hover:shadow-[0_0_25px_rgba(0,255,162,0.55)] transition">REGISTER</a>
+        </div>
     </nav>
 
-    <section class="min-h-screen pt-32 px-6 flex flex-col items-center relative overflow-hidden">
-        <div class="absolute top-1/4 w-[500px] h-[500px] bg-[#00ffa2]/10 blur-[120px] rounded-full -z-10"></div>
+    <section class="min-h-screen pt-28 sm:pt-32 pb-16 px-6 flex flex-col items-center relative overflow-hidden">
+        <div class="absolute top-1/4 w-[320px] h-[320px] sm:w-[500px] sm:h-[500px] bg-[#00ffa2]/10 blur-[120px] rounded-full -z-10"></div>
         
         <div class="text-center z-10">
-            <h1 class="text-5xl md:text-8xl font-black tracking-tight leading-none mb-6">
+            <h1 class="text-[2.6rem] sm:text-6xl md:text-8xl font-black tracking-tight leading-none mb-6">
                 IN A <span class="italic">BLINK,</span><br>IT’S <span class="neon-text">DONE.</span>
             </h1>
             <p class="text-gray-400 max-w-xl mx-auto mb-10 text-sm md:text-base leading-relaxed">
                 The first hyper-local task protocol built for LASUites. Secure. Cinematic. Instant. From print-outs at Gate to pro-tech gigs, bridge the gap between "Needed" and "Done."
             </p>
             
-            <div class="flex flex-col md:flex-row gap-4 justify-center mb-20">
-                <button class="bg-[#00ffa2] text-[#0b0e14] px-10 py-4 rounded-xl font-black text-sm tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.4)]">ENTER THE NEXUS</button>
-                <button id="install-btn-hero" class="glass px-10 py-4 rounded-xl font-bold text-sm border-white/10">INSTALL APP</button>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16 sm:mb-20">
+                <a href="register.html" class="bg-[#00ffa2] text-[#0b0e14] px-10 py-4 rounded-xl font-black text-sm tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.4)] text-center">ENTER THE NEXUS</a>
+                <button id="install-btn-hero" data-pwa-install class="glass px-10 py-4 rounded-xl font-bold text-sm border-white/10">INSTALL APP</button>
             </div>
         </div>
 
@@ -129,20 +133,20 @@
     <section class="py-24 glass border-y border-white/5 relative overflow-hidden">
         <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
             <div class="flex-1">
-                <h2 class="text-4xl font-black mb-6 italic">THE <span class="neon-text">BLINK-CREDITS</span> ECONOMY</h2>
+                <h2 class="text-3xl sm:text-4xl font-black mb-6 italic">THE <span class="neon-text">BLINK-CREDITS</span> ECONOMY</h2>
                 <p class="text-gray-400 mb-8 leading-relaxed">Stay in the top 10 on the Leaderboard to unlock "Blink King/Queen" status. Earn points for every speedy delivery and referral. Swap them instantly for what you need.</p>
-                <div class="flex gap-4">
-                    <div class="p-4 glass rounded-2xl flex flex-col items-center">
-                        <span class="text-xs font-bold opacity-50 uppercase mb-2">Airtime</span>
-                        <span class="font-black">MTN/GLO</span>
+                <div class="grid grid-cols-3 gap-2 sm:gap-4 sm:max-w-md">
+                    <div class="p-3 sm:p-4 glass rounded-2xl flex flex-col items-center text-center">
+                        <span class="text-[10px] sm:text-xs font-bold opacity-50 uppercase mb-2">Airtime</span>
+                        <span class="font-black text-sm sm:text-base">MTN/GLO</span>
                     </div>
-                    <div class="p-4 glass rounded-2xl flex flex-col items-center">
-                        <span class="text-xs font-bold opacity-50 uppercase mb-2">Data</span>
-                        <span class="font-black">1GB/5GB</span>
+                    <div class="p-3 sm:p-4 glass rounded-2xl flex flex-col items-center text-center">
+                        <span class="text-[10px] sm:text-xs font-bold opacity-50 uppercase mb-2">Data</span>
+                        <span class="font-black text-sm sm:text-base">1GB/5GB</span>
                     </div>
-                    <div class="p-4 glass rounded-2xl flex flex-col items-center">
-                        <span class="text-xs font-bold opacity-50 uppercase mb-2">Vault</span>
-                        <span class="font-black">Cash</span>
+                    <div class="p-3 sm:p-4 glass rounded-2xl flex flex-col items-center text-center">
+                        <span class="text-[10px] sm:text-xs font-bold opacity-50 uppercase mb-2">Vault</span>
+                        <span class="font-black text-sm sm:text-base">Cash</span>
                     </div>
                 </div>
             </div>
@@ -168,117 +172,21 @@
         </div>
     </section>
 
-    <section class="py-32 px-6 text-center">
-        <div class="glass max-w-4xl mx-auto p-12 md:p-20 rounded-[40px] border-[#00ffa2]/30">
+    <section class="py-24 sm:py-32 px-4 sm:px-6 text-center">
+        <div class="glass max-w-4xl mx-auto px-6 py-12 sm:p-12 md:p-20 rounded-[32px] sm:rounded-[40px] border-[#00ffa2]/30">
             <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">READY TO <span class="neon-text italic">BLINK?</span></h2>
             <p class="text-gray-400 mb-10 max-w-lg mx-auto">Add BlinkAm to your Home Screen for the full cinematic experience and real-time push notifications.</p>
             <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-                <button class="bg-[#00ffa2] text-[#0b0e14] w-full md:w-auto px-12 py-5 rounded-2xl font-black text-lg shadow-[0_0_40px_rgba(0,255,162,0.3)] hover:scale-105 transition uppercase tracking-widest">
+                <a href="register.html" class="bg-[#00ffa2] text-[#0b0e14] w-full md:w-auto px-6 sm:px-12 py-5 rounded-2xl font-black text-base sm:text-lg shadow-[0_0_40px_rgba(0,255,162,0.3)] hover:scale-105 transition uppercase tracking-widest">
                     START BLINKING
-                </button>
-                <button id="install-btn-cta" class="glass w-full md:w-auto px-12 py-5 rounded-2xl font-black text-lg border-white/10 hover:bg-white/5 transition uppercase tracking-widest">
+                </a>
+                <button id="install-btn-cta" data-pwa-install class="glass w-full md:w-auto px-6 sm:px-12 py-5 rounded-2xl font-black text-base sm:text-lg border-white/10 hover:bg-white/5 transition uppercase tracking-widest">
                     INSTALL NOW
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- PWA Service Worker Registration and Install Prompt Handler -->
-    <script>
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then((registration) => {
-                        console.log('Service Worker registered successfully:', registration);
-                    })
-                    .catch((error) => {
-                        console.log('Service Worker registration failed:', error);
-                    });
-            });
-        }
-
-        // PWA Install Prompt Handler
-        let deferredPrompt;
-        const installBtnHero = document.getElementById('install-btn-hero');
-        const installBtnCta = document.getElementById('install-btn-cta');
-
-        // Listen for beforeinstallprompt event
-        window.addEventListener('beforeinstallprompt', (e) => {
-            // Prevent the mini-infobar from appearing on mobile
-            e.preventDefault();
-            // Stash the event so it can be triggered later
-            deferredPrompt = e;
-            
-            // Update UI to show install buttons are available
-            if (installBtnHero) {
-                installBtnHero.style.display = 'block';
-                installBtnHero.style.background = 'linear-gradient(135deg, #00ffa2 0%, #00cc8a 100%)';
-                installBtnHero.style.color = '#0b0e14';
-                installBtnHero.style.boxShadow = '0 0 30px rgba(0, 255, 162, 0.5)';
-            }
-            if (installBtnCta) {
-                installBtnCta.style.display = 'block';
-                installBtnCta.style.background = 'linear-gradient(135deg, #00ffa2 0%, #00cc8a 100%)';
-                installBtnCta.style.color = '#0b0e14';
-                installBtnCta.style.boxShadow = '0 0 30px rgba(0, 255, 162, 0.5)';
-            }
-        });
-
-        // Handle install button clicks
-        function handleInstallClick(e) {
-            e.preventDefault();
-            
-            // Hide the button temporarily
-            e.target.style.display = 'none';
-            
-            // Show the install prompt
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                
-                // Wait for the user to respond to the prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    // Act on the user's choice
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                        // Show button again if dismissed
-                        e.target.style.display = 'block';
-                    }
-                    
-                    // Clear the deferredPrompt variable
-                    deferredPrompt = null;
-                });
-            } else {
-                // Fallback for iOS or browsers that don't support beforeinstallprompt
-                alert('To install BlinkAm:\n\n1. Tap the Share button in your browser\n2. Select "Add to Home Screen"\n3. Tap "Add" to complete installation');
-                e.target.style.display = 'block';
-            }
-        }
-
-        if (installBtnHero) {
-            installBtnHero.addEventListener('click', handleInstallClick);
-        }
-        if (installBtnCta) {
-            installBtnCta.addEventListener('click', handleInstallClick);
-        }
-
-        // Listen for app installed event
-        window.addEventListener('appinstalled', () => {
-            // Hide the install buttons
-            if (installBtnHero) {
-                installBtnHero.style.display = 'none';
-            }
-            if (installBtnCta) {
-                installBtnCta.style.display = 'none';
-            }
-            
-            // Clear the deferredPrompt
-            deferredPrompt = null;
-            console.log('BlinkAm was installed');
-        });
-    </script>
 
 </body>
 </html>

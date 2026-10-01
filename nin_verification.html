@@ -4,31 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlinkAm | Security Wall</title>
+    <meta name="theme-color" content="#00ffa2">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <script src="https://widget.dojah.io/widget.js"></script>
+    <script src="pwa.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; }
-        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; --danger: #ff4d6d; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
         .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
         .neon-border:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 255, 162, 0.2); outline: none; }
+        .neon-border.is-invalid { border-color: var(--danger); }
         .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); }
         .step-dot.active { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
-        
-        /* Shimmer animation for loading */
+        .step-dot.done { background: rgba(0, 255, 162, 0.5); }
+
         .shimmer {
             background: linear-gradient(90deg, transparent, rgba(0, 255, 162, 0.1), transparent);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
         }
         @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        .blink-eye { width: 22px; height: 22px; display: inline-block; animation: blink 1.1s ease-in-out infinite; }
+        @keyframes blink { 0%, 40%, 100% { transform: scaleY(1); } 50%, 55% { transform: scaleY(0.08); } }
+        button:disabled { opacity: .75; cursor: not-allowed; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center px-6 relative">
+<body class="min-h-screen flex flex-col items-center justify-center px-5 sm:px-6 py-24 relative">
 
-    <div class="fixed top-12 flex gap-3 items-center">
-        <div class="step-dot active"></div>
+    <div class="absolute top-10 flex gap-3 items-center">
+        <div class="step-dot done"></div>
         <div class="w-8 h-[1px] bg-white/10"></div>
-        <div class="step-dot"></div>
+        <div class="step-dot active"></div>
         <div class="w-8 h-[1px] bg-white/10"></div>
         <div class="step-dot"></div>
     </div>
@@ -40,52 +53,204 @@
             </svg>
         </div>
         <h1 class="text-3xl font-black tracking-tight uppercase">Security Wall</h1>
-        <p class="text-gray-400 text-sm mt-2">Verify your NIN via <span class="text-white font-bold">Mono</span> to unlock the Nexus.</p>
+        <p class="text-gray-400 text-sm mt-2">
+            <span id="greeting"></span>Verify your NIN via <span class="text-white font-bold">Dojah</span> to unlock the Nexus.
+        </p>
     </header>
 
-    <div class="w-full max-w-md glass-input p-8 rounded-[32px] relative overflow-hidden">
-        <div id="shimmer-overlay" class="absolute inset-0 shimmer hidden"></div>
-        
-        <div class="space-y-6">
+    <div class="w-full max-w-md glass-input p-6 sm:p-8 rounded-[32px] relative overflow-hidden">
+        <div id="shimmer-overlay" class="absolute inset-0 shimmer hidden pointer-events-none"></div>
+
+        <div id="verify-panel" class="space-y-6">
             <div>
-                <label class="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 ml-1">National Identity Number</label>
-                <input type="text" maxlength="11" placeholder="00000000000" 
-                       class="w-full mt-2 p-5 glass-input rounded-2xl text-xl font-bold tracking-[0.3em] text-center neon-border transition-all"
+                <label for="nin-input" class="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 ml-1">National Identity Number</label>
+                <input type="text" maxlength="11" placeholder="00000000000" inputmode="numeric" autocomplete="off"
+                       class="w-full mt-2 p-5 glass-input rounded-2xl text-lg sm:text-xl font-bold tracking-[0.2em] sm:tracking-[0.3em] text-center neon-border transition-all"
                        id="nin-input">
+                <p id="nin-error" class="text-[#ff4d6d] text-[11px] font-bold mt-2 ml-1 hidden" role="alert"></p>
             </div>
 
             <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex items-start gap-3">
-                <svg class="w-5 h-5 text-[#00ffa2] mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="w-5 h-5 text-[#00ffa2] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                 </svg>
                 <p class="text-[11px] text-gray-400 leading-relaxed">
-                    Identity verification is handled by <span class="text-white font-bold">Mono Connect</span>. Your sensitive data is encrypted and never stored on BlinkAm servers.
+                    Identity verification is handled by <span class="text-white font-bold">Dojah</span>. Your NIN is checked against the national registry and never stored on BlinkAm servers.
                 </p>
             </div>
 
-            <button onclick="startVerification()" class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.3)] hover:scale-[1.02] active:scale-[0.98] transition">
-                Verify Identity
+            <div id="status-banner" class="hidden rounded-xl p-4 text-xs font-bold border" role="status" aria-live="polite"></div>
+
+            <button id="verify-btn" type="button"
+                    class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.3)] hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-3">
+                <svg id="verify-eye" class="blink-eye hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7S2.5 12 2.5 12z"/>
+                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                </svg>
+                <span id="verify-label">Verify Identity</span>
             </button>
+        </div>
+
+        <div id="success-panel" class="hidden text-center space-y-4 py-4">
+            <div class="mx-auto w-16 h-16 rounded-full bg-[#00ffa2] flex items-center justify-center shadow-[0_0_40px_rgba(0,255,162,0.5)]">
+                <svg class="w-8 h-8 text-[#0b0e14]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h2 class="text-xl font-black uppercase tracking-tight">Identity Verified</h2>
+            <p class="text-sm text-gray-400">Welcome to the Nexus. Entering the Retina feed…</p>
         </div>
     </div>
 
-    <p class="mt-8 text-[10px] uppercase tracking-widest opacity-30 font-bold">
+    <p class="mt-8 text-[10px] uppercase tracking-widest opacity-30 font-bold text-center">
         Secure Handshake • 256-bit Encryption
     </p>
 
     <script>
+        const CONFIG = window.BLINKAM_CONFIG;
+        const DOJAH = CONFIG.dojah;
+        const supabaseClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+
+        const ninInput = document.getElementById('nin-input');
+        const ninError = document.getElementById('nin-error');
+        const shimmer = document.getElementById('shimmer-overlay');
+        const verifyBtn = document.getElementById('verify-btn');
+        const verifyEye = document.getElementById('verify-eye');
+        const verifyLabel = document.getElementById('verify-label');
+        const banner = document.getElementById('status-banner');
+
+        const pending = {
+            fullName: sessionStorage.getItem('pending_full_name') || '',
+            moniker: sessionStorage.getItem('pending_moniker') || '',
+            email: sessionStorage.getItem('pending_email') || '',
+            userId: sessionStorage.getItem('pending_user_id') || ''
+        };
+        if (pending.moniker) document.getElementById('greeting').textContent = `${pending.moniker}, `;
+
+        ninInput.addEventListener('input', () => {
+            ninInput.value = ninInput.value.replace(/\D/g, '').slice(0, 11);
+            ninError.classList.add('hidden');
+            ninInput.classList.remove('is-invalid');
+        });
+
+        function setLoading(isLoading, label) {
+            verifyBtn.disabled = isLoading;
+            verifyEye.classList.toggle('hidden', !isLoading);
+            shimmer.classList.toggle('hidden', !isLoading);
+            verifyLabel.textContent = label || (isLoading ? 'Opening Dojah…' : 'Verify Identity');
+        }
+
+        function showBanner(message, tone) {
+            const tones = {
+                error: 'border-[#ff4d6d]/40 bg-[#ff4d6d]/10 text-[#ff8fa3]',
+                info: 'border-white/10 bg-white/5 text-gray-300'
+            };
+            banner.className = `rounded-xl p-4 text-xs font-bold border ${tones[tone] || tones.info}`;
+            banner.textContent = message;
+        }
+
+        function hideBanner() { banner.className = 'hidden'; }
+
+        function dojahConfigured() {
+            return typeof window.Connect === 'function' && DOJAH && DOJAH.appId && DOJAH.publicKey && DOJAH.widgetId;
+        }
+
+        function buildReferenceId() {
+            const base = pending.userId || (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+            return `blinkam-${base}-${Date.now()}`;
+        }
+
+        function splitName(full) {
+            const parts = full.trim().split(/\s+/);
+            return { first_name: parts[0] || '', last_name: parts.slice(1).join(' ') };
+        }
+
+        async function handleVerified(response, referenceId) {
+            const record = {
+                provider: 'dojah',
+                reference_id: referenceId,
+                status: 'client_verified',
+                verified_at: new Date().toISOString(),
+                verification_status: response && (response.status || response.verificationStatus) || null
+            };
+            sessionStorage.setItem('blinkam_kyc', JSON.stringify(record));
+
+            try {
+                const { data } = await supabaseClient.auth.getSession();
+                if (data && data.session) {
+                    await supabaseClient.auth.updateUser({
+                        data: { kyc_provider: 'dojah', kyc_reference: referenceId, kyc_status: 'client_verified', kyc_verified_at: record.verified_at }
+                    });
+                }
+            } catch (err) {
+                console.warn('Could not persist KYC metadata to Supabase:', err);
+            }
+
+            if (window.navigator.vibrate) window.navigator.vibrate([60, 40, 60]);
+            document.getElementById('verify-panel').classList.add('hidden');
+            document.getElementById('success-panel').classList.remove('hidden');
+            shimmer.classList.add('hidden');
+            setTimeout(() => { window.location.href = CONFIG.routes.afterVerification; }, 1800);
+        }
+
         function startVerification() {
-            const input = document.getElementById('nin-input');
-            const shimmer = document.getElementById('shimmer-overlay');
-            
-            if(input.value.length === 11) {
-                shimmer.classList.remove('hidden');
-                // Mono API Logic will be triggered here
-                console.log("Initializing Mono Connect...");
-            } else {
-                alert("Please enter a valid 11-digit NIN.");
+            hideBanner();
+            const nin = ninInput.value.trim();
+            if (!/^\d{11}$/.test(nin)) {
+                ninError.textContent = 'Enter your 11-digit NIN.';
+                ninError.classList.remove('hidden');
+                ninInput.classList.add('is-invalid');
+                ninInput.focus();
+                return;
+            }
+
+            if (!dojahConfigured()) {
+                showBanner('Verification is not configured yet. Add the Dojah appId, publicKey and widgetId to config.js.', 'error');
+                return;
+            }
+
+            setLoading(true);
+            const referenceId = buildReferenceId();
+            const userData = { ...splitName(pending.fullName) };
+            if (pending.email) userData.email = pending.email;
+
+            const options = {
+                app_id: DOJAH.appId,
+                p_key: DOJAH.publicKey,
+                type: 'custom',
+                config: { widget_id: DOJAH.widgetId },
+                reference_id: referenceId,
+                gov_data: { nin },
+                metadata: { user_id: pending.userId || 'anonymous' },
+                onSuccess: (response) => {
+                    console.log('Dojah success', response);
+                    handleVerified(response, referenceId);
+                },
+                onError: (err) => {
+                    console.error('Dojah error', err);
+                    setLoading(false);
+                    showBanner('Verification failed. Check your NIN and try again.', 'error');
+                },
+                onClose: () => {
+                    if (!document.getElementById('success-panel').classList.contains('hidden')) return;
+                    setLoading(false);
+                    showBanner('Verification window closed before completion. Tap Verify Identity to try again.', 'info');
+                }
+            };
+            if (userData.first_name) options.user_data = userData;
+
+            try {
+                const connect = new Connect(options);
+                connect.setup();
+                connect.open();
+                setLoading(true, 'Verifying…');
+            } catch (err) {
+                console.error('Dojah init failed', err);
+                setLoading(false);
+                showBanner('Could not start verification. Check your connection and try again.', 'error');
             }
         }
+
+        verifyBtn.addEventListener('click', startVerification);
+        ninInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startVerification(); });
     </script>
 
 </body>

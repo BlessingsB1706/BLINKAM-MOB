@@ -4,33 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlinkAm | Account Setup</title>
+    <meta name="theme-color" content="#00ffa2">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="config.js"></script>
+    <script src="pwa.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; }
-        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; }
+        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; --danger: #ff4d6d; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
         .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .neon-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 255, 162, 0.15); outline: none; }
+        .neon-input.is-invalid { border-color: var(--danger); box-shadow: 0 0 12px rgba(255, 77, 109, 0.15); }
+        .neon-input.is-valid { border-color: rgba(0, 255, 162, 0.45); }
+        .field-error { color: var(--danger); font-size: 11px; font-weight: 700; margin: 6px 0 0 4px; min-height: 0; }
+        .field-error:empty { display: none; }
+        .field-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 900; color: rgba(255,255,255,0.45); margin-left: 4px; }
         .role-card { transition: all 0.3s ease; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
         .role-card.selected { border-color: var(--neon-cyan); background: rgba(0, 255, 162, 0.05); }
-        
-        /* Custom Select Styling */
+
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300ffa2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+
+        .strength-bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; }
+        .strength-fill { height: 100%; width: 0; transition: width .3s ease, background-color .3s ease; }
+
+        /* Blinking-eye loading state */
+        .blink-eye { width: 22px; height: 22px; display: inline-block; animation: blink 1.1s ease-in-out infinite; transform-origin: center; }
+        @keyframes blink { 0%, 40%, 100% { transform: scaleY(1); } 50%, 55% { transform: scaleY(0.08); } }
+        button:disabled { opacity: .75; cursor: not-allowed; }
+
+        .toast { position: fixed; left: 50%; top: 20px; transform: translate(-50%, -150%); z-index: 60; transition: transform .45s cubic-bezier(.2,.9,.25,1); width: calc(100% - 32px); max-width: 420px; }
+        .toast.show { transform: translate(-50%, 0); }
     </style>
-    <script>
-        // BlinkAm Unified Production Backend Configuration
-        const SUPABASE_URL = "https://efmcugpihystaytfjerg.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmbWN1Z3BpaHlzdGF5dGZqZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNjY2NTYsImV4cCI6MjA5NDY0MjY1Nn0.G53kxih4lhbo6TfnWhNTLwiP7vgnzWE-rI7G98meErc";
-        
-        // FIXED: Prefixed explicitly with the parent 'supabase' object initialization wrapper
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    </script>
 </head>
-<body class="min-h-screen flex flex-col p-6 max-w-lg mx-auto pb-20">
+<body class="min-h-screen flex flex-col px-5 sm:px-6 max-w-lg mx-auto pb-20">
+
+    <div id="toast" class="toast glass-panel rounded-2xl p-4 flex items-center gap-3 border" role="status" aria-live="polite">
+        <span id="toast-icon" class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"></span>
+        <div>
+            <p id="toast-title" class="text-sm font-black"></p>
+            <p id="toast-body" class="text-xs text-gray-400"></p>
+        </div>
+    </div>
 
     <header class="mt-8 mb-10 flex justify-between items-center">
-        <h1 class="text-2xl font-black italic tracking-tighter">BLINK<span class="text-[#00ffa2]">AM</span></h1>
+        <a href="BlinkAm_Landing_page.html" class="text-2xl font-black italic tracking-tighter">BLINK<span class="text-[#00ffa2]">AM</span></a>
         <div class="text-[10px] font-bold tracking-widest text-[#00ffa2] bg-[#00ffa2]/10 px-3 py-1 rounded-full border border-[#00ffa2]/20">
             STEP 01/03
         </div>
@@ -42,24 +63,63 @@
             <p class="text-gray-400 text-sm mt-2">Provide your legal details to sync with the <span class="text-white font-bold">Security Wall</span>.</p>
         </div>
 
-        <form id="registration-form" class="space-y-5">
+        <div id="form-alert" class="hidden rounded-2xl p-4 text-sm font-bold border border-[#ff4d6d]/40 bg-[#ff4d6d]/10 text-[#ff8fa3]" role="alert"></div>
+
+        <form id="registration-form" class="space-y-5" novalidate>
             <div>
-                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Full Legal Name (As on NIN)</label>
-                <input type="text" id="legal-name-input" required
-                       class="w-full mt-2 p-5 glass-panel rounded-2xl font-bold neon-input transition-all placeholder:opacity-20 text-white">
+                <label for="legal-name-input" class="field-label">Full Legal Name (As on NIN)</label>
+                <input type="text" id="legal-name-input" name="fullName" autocomplete="name" placeholder="Adebayo Chioma Musa"
+                       class="w-full mt-2 p-5 glass-panel rounded-2xl font-bold neon-input transition-all placeholder:text-white/20 text-white">
+                <p class="field-error" data-error-for="fullName"></p>
             </div>
 
             <div>
-                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Moniker (Display Name)</label>
+                <label for="moniker-input" class="field-label">Moniker (Display Name)</label>
                 <div class="relative mt-2">
                     <span class="absolute left-5 top-1/2 -translate-y-1/2 text-[#00ffa2] font-bold">@</span>
-                    <input type="text" id="moniker-input" required
-                           class="w-full pl-10 pr-5 py-5 glass-panel rounded-2xl font-bold neon-input transition-all text-white">
+                    <input type="text" id="moniker-input" name="moniker" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="blinkmaster"
+                           class="w-full pl-10 pr-5 py-5 glass-panel rounded-2xl font-bold neon-input transition-all placeholder:text-white/20 text-white">
                 </div>
+                <p class="field-error" data-error-for="moniker"></p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="email-input" class="field-label">Email Address</label>
+                    <input type="email" id="email-input" name="email" autocomplete="email" inputmode="email" placeholder="you@example.com"
+                           class="w-full mt-2 p-4 glass-panel rounded-2xl font-bold neon-input text-sm text-white placeholder:text-white/20">
+                    <p class="field-error" data-error-for="email"></p>
+                </div>
+                <div>
+                    <label for="phone-input" class="field-label">Phone Number</label>
+                    <input type="tel" id="phone-input" name="phone" autocomplete="tel" inputmode="tel" placeholder="0803 123 4567"
+                           class="w-full mt-2 p-4 glass-panel rounded-2xl font-bold neon-input text-sm text-white placeholder:text-white/20">
+                    <p class="field-error" data-error-for="phone"></p>
+                </div>
+            </div>
+            <p class="text-[11px] text-gray-500 -mt-2 ml-1">Provide an email, a Nigerian phone number, or both.</p>
+
+            <div>
+                <label for="password-input" class="field-label">Password</label>
+                <div class="relative mt-2">
+                    <input type="password" id="password-input" name="password" autocomplete="new-password" placeholder="Min. 8 characters"
+                           class="w-full p-5 pr-16 glass-panel rounded-2xl font-bold neon-input transition-all text-white placeholder:text-white/20">
+                    <button type="button" data-toggle-visibility="password-input" class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-[#00ffa2]">Show</button>
+                </div>
+                <div class="strength-bar mt-3"><div id="strength-fill" class="strength-fill"></div></div>
+                <p id="strength-label" class="text-[10px] uppercase tracking-widest font-bold text-white/40 mt-1 ml-1">Use 8+ chars with upper, lower, number &amp; symbol</p>
+                <p class="field-error" data-error-for="password"></p>
             </div>
 
             <div>
-                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Identity Tier</label>
+                <label for="password-confirm-input" class="field-label">Confirm Password</label>
+                <input type="password" id="password-confirm-input" name="passwordConfirm" autocomplete="new-password"
+                       class="w-full mt-2 p-5 glass-panel rounded-2xl font-bold neon-input transition-all text-white">
+                <p class="field-error" data-error-for="passwordConfirm"></p>
+            </div>
+
+            <div>
+                <span class="field-label">Identity Tier</span>
                 <div class="grid grid-cols-2 gap-4 mt-2">
                     <div id="tier-student" class="role-card p-4 rounded-2xl text-center selected" onclick="selectRole('Student', this)">
                         <span class="block text-xs font-black uppercase">Student</span>
@@ -70,10 +130,10 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Faculty</label>
-                    <select id="faculty-input" class="w-full mt-2 p-4 glass-panel rounded-2xl font-bold neon-input text-xs text-white bg-[#0b0e14]">
+                    <label for="faculty-input" class="field-label">Faculty</label>
+                    <select id="faculty-input" class="w-full mt-2 p-4 pr-10 glass-panel rounded-2xl font-bold neon-input text-xs text-white bg-[#0b0e14]">
                         <option>Faculty of Arts</option>
                         <option>Faculty of Education</option>
                         <option>Faculty of Law</option>
@@ -90,27 +150,34 @@
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Department</label>
-                    <input type="text" id="department-input" required
+                    <label for="department-input" class="field-label">Department</label>
+                    <input type="text" id="department-input" name="department"
                            class="w-full mt-2 p-4 glass-panel rounded-2xl font-bold neon-input text-xs text-white">
+                    <p class="field-error" data-error-for="department"></p>
                 </div>
             </div>
 
             <div>
-                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Secure Vault PIN (4 Digits)</label>
-                <input type="password" id="vault-pin-input" placeholder="••••" required
-                       pattern="[0-9]*" inputmode="numeric" maxlength="4"
+                <label for="vault-pin-input" class="field-label">Secure Vault PIN (4 Digits)</label>
+                <input type="password" id="vault-pin-input" name="vaultPin" placeholder="••••"
+                       inputmode="numeric" maxlength="4" autocomplete="off"
                        class="w-full mt-2 p-5 glass-panel rounded-2xl font-bold text-center tracking-[1em] text-xl text-[#00ffa2] neon-input transition-all">
+                <p class="text-[11px] text-gray-500 mt-2 ml-1">4 different digits. No repeats (1123, 0000) or sequences (1234, 9876).</p>
+                <p class="field-error" data-error-for="vaultPin"></p>
             </div>
 
-            <button type="button" onclick="executeProductionSignUp()" 
-                    class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.3)] mt-6 active:scale-[0.98] transition-transform">
-                Continue to NIN Sync
+            <button type="submit" id="submit-btn"
+                    class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.3)] mt-6 active:scale-[0.98] transition-transform flex items-center justify-center gap-3">
+                <svg id="submit-eye" class="blink-eye hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7S2.5 12 2.5 12z"/>
+                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                </svg>
+                <span id="submit-label">Continue to NIN Sync</span>
             </button>
 
             <div class="text-center mt-6">
                 <p class="text-xs text-gray-500 font-medium">
-                    Already authenticated? 
+                    Already authenticated?
                     <a href="log.html" class="text-[#00ffa2] hover:underline font-bold tracking-wide uppercase text-[10px] ml-1">Open login →</a>
                 </p>
             </div>
@@ -118,6 +185,9 @@
     </main>
 
     <script>
+        const CONFIG = window.BLINKAM_CONFIG;
+        const supabaseClient = supabase.createClient(CONFIG.supabase.url, CONFIG.supabase.anonKey);
+
         let selectedTier = "Student";
 
         function selectRole(tierValue, element) {
@@ -126,55 +196,286 @@
             selectedTier = tierValue;
         }
 
-        async function executeProductionSignUp() {
-            const fullName = document.getElementById('legal-name-input').value.trim();
-            const moniker = document.getElementById('moniker-input').value.trim().toLowerCase();
+        const form = document.getElementById('registration-form');
+        const fields = {
+            fullName: document.getElementById('legal-name-input'),
+            moniker: document.getElementById('moniker-input'),
+            email: document.getElementById('email-input'),
+            phone: document.getElementById('phone-input'),
+            password: document.getElementById('password-input'),
+            passwordConfirm: document.getElementById('password-confirm-input'),
+            department: document.getElementById('department-input'),
+            vaultPin: document.getElementById('vault-pin-input')
+        };
+
+        // ---------- Validators (return an error string, or "" when valid) ----------
+
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+        function normalizeNigerianPhone(raw) {
+            const digits = raw.replace(/[\s\-()]/g, '');
+            let m = digits.match(/^(?:\+?234|0)([789][01]\d{8})$/);
+            return m ? '+234' + m[1] : null;
+        }
+
+        function passwordScore(pw) {
+            let score = 0;
+            if (pw.length >= 8) score++;
+            if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+            if (/\d/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            if (pw.length >= 12) score++;
+            return score;
+        }
+
+        function pinProblem(pin) {
+            if (!/^\d{4}$/.test(pin)) return "PIN must be exactly 4 digits.";
+            if (new Set(pin).size !== 4) return "PIN can't repeat digits (e.g. 0000, 1123).";
+            const steps = [1, 2, 3].map(i => Number(pin[i]) - Number(pin[i - 1]));
+            if (steps.every(s => s === 1) || steps.every(s => s === -1)) return "PIN can't be a sequence (e.g. 1234, 9876).";
+            return "";
+        }
+
+        const validators = {
+            fullName(v) {
+                if (!v) return "Enter your full legal name.";
+                if (!/^[A-Za-z][A-Za-z'\-\.]*(\s+[A-Za-z][A-Za-z'\-\.]*)+$/.test(v)) return "Use at least first and last name, letters only.";
+                if (v.length > 80) return "Name is too long.";
+                return "";
+            },
+            moniker(v) {
+                if (!v) return "Pick a moniker.";
+                if (!/^[a-z0-9_.]{3,20}$/.test(v)) return "3–20 characters: letters, numbers, _ or . only.";
+                return "";
+            },
+            email(v, all) {
+                if (!v && !all.phone) return "Enter an email or phone number.";
+                if (v && !EMAIL_RE.test(v)) return "Enter a valid email address.";
+                return "";
+            },
+            phone(v, all) {
+                if (!v && !all.email) return "Enter an email or phone number.";
+                if (v && !normalizeNigerianPhone(v)) return "Use a Nigerian number, e.g. 08031234567 or +2348031234567.";
+                return "";
+            },
+            password(v) {
+                if (!v) return "Create a password.";
+                if (v.length < 8) return "Password must be at least 8 characters.";
+                if (passwordScore(v) < 4) return "Add upper & lower case letters, a number and a symbol.";
+                return "";
+            },
+            passwordConfirm(v, all) {
+                if (!v) return "Confirm your password.";
+                if (v !== all.password) return "Passwords don't match.";
+                return "";
+            },
+            department(v) {
+                return v ? "" : "Enter your department.";
+            },
+            vaultPin(v) {
+                return pinProblem(v);
+            }
+        };
+
+        function readValues() {
+            return {
+                fullName: fields.fullName.value.trim().replace(/\s+/g, ' '),
+                moniker: fields.moniker.value.trim().replace(/^@/, '').toLowerCase(),
+                email: fields.email.value.trim().toLowerCase(),
+                phone: fields.phone.value.trim(),
+                password: fields.password.value,
+                passwordConfirm: fields.passwordConfirm.value,
+                department: fields.department.value.trim(),
+                vaultPin: fields.vaultPin.value.trim()
+            };
+        }
+
+        function setFieldError(name, message) {
+            const input = fields[name];
+            const slot = document.querySelector(`[data-error-for="${name}"]`);
+            if (slot) slot.textContent = message;
+            input.classList.toggle('is-invalid', !!message);
+            input.classList.toggle('is-valid', !message && !!input.value);
+            input.setAttribute('aria-invalid', message ? 'true' : 'false');
+        }
+
+        function validateField(name, values = readValues()) {
+            const message = validators[name](values[name], values);
+            setFieldError(name, message);
+            return !message;
+        }
+
+        function validateAll() {
+            const values = readValues();
+            let firstInvalid = null;
+            Object.keys(validators).forEach(name => {
+                if (!validateField(name, values) && !firstInvalid) firstInvalid = fields[name];
+            });
+            if (firstInvalid) firstInvalid.focus();
+            return !firstInvalid;
+        }
+
+        // Live feedback: validate a field once the user has left it, then on every keystroke.
+        const touched = new Set();
+        Object.entries(fields).forEach(([name, input]) => {
+            input.addEventListener('blur', () => { touched.add(name); validateField(name); });
+            input.addEventListener('input', () => {
+                hideAlert();
+                if (touched.has(name)) validateField(name);
+                if ((name === 'email' || name === 'phone')) {
+                    const other = name === 'email' ? 'phone' : 'email';
+                    if (touched.has(other)) validateField(other);
+                }
+                if (name === 'password' && touched.has('passwordConfirm')) validateField('passwordConfirm');
+            });
+        });
+
+        fields.vaultPin.addEventListener('input', () => {
+            fields.vaultPin.value = fields.vaultPin.value.replace(/\D/g, '').slice(0, 4);
+        });
+
+        const strengthFill = document.getElementById('strength-fill');
+        const strengthLabel = document.getElementById('strength-label');
+        const STRENGTH = [
+            { label: "Too weak", color: "#ff4d6d", width: "15%" },
+            { label: "Weak", color: "#ff4d6d", width: "30%" },
+            { label: "Fair", color: "#ffaa00", width: "55%" },
+            { label: "Good", color: "#9be564", width: "75%" },
+            { label: "Strong", color: "#00ffa2", width: "90%" },
+            { label: "Vault-grade", color: "#00ffa2", width: "100%" }
+        ];
+        fields.password.addEventListener('input', () => {
+            const pw = fields.password.value;
+            if (!pw) {
+                strengthFill.style.width = '0';
+                strengthLabel.textContent = "Use 8+ chars with upper, lower, number & symbol";
+                strengthLabel.style.color = '';
+                return;
+            }
+            const s = STRENGTH[passwordScore(pw)];
+            strengthFill.style.width = s.width;
+            strengthFill.style.backgroundColor = s.color;
+            strengthLabel.textContent = s.label;
+            strengthLabel.style.color = s.color;
+        });
+
+        document.querySelectorAll('[data-toggle-visibility]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const input = document.getElementById(btn.dataset.toggleVisibility);
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                btn.textContent = show ? 'Hide' : 'Show';
+            });
+        });
+
+        // ---------- UI state helpers ----------
+
+        const submitBtn = document.getElementById('submit-btn');
+        const submitEye = document.getElementById('submit-eye');
+        const submitLabel = document.getElementById('submit-label');
+        const formAlert = document.getElementById('form-alert');
+
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            submitBtn.setAttribute('aria-busy', String(isLoading));
+            submitEye.classList.toggle('hidden', !isLoading);
+            submitLabel.textContent = isLoading ? 'Syncing Identity…' : 'Continue to NIN Sync';
+            Object.values(fields).forEach(f => f.readOnly = isLoading);
+        }
+
+        function showAlert(message) {
+            formAlert.textContent = message;
+            formAlert.classList.remove('hidden');
+            formAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideAlert() { formAlert.classList.add('hidden'); }
+
+        function showToast(title, body, ok = true) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-body').textContent = body;
+            toast.style.borderColor = ok ? 'rgba(0,255,162,0.4)' : 'rgba(255,77,109,0.4)';
+            icon.style.background = ok ? '#00ffa2' : '#ff4d6d';
+            icon.innerHTML = ok
+                ? '<svg class="w-5 h-5 text-[#0b0e14]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>'
+                : '<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>';
+            toast.classList.add('show');
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        async function hashPin(pin, salt) {
+            const bytes = new TextEncoder().encode(`blinkam:${salt}:${pin}`);
+            const digest = await crypto.subtle.digest('SHA-256', bytes);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function friendlyAuthError(err) {
+            const msg = (err && err.message) || String(err);
+            if (/already registered|already exists/i.test(msg)) return { field: fields.email.value ? 'email' : 'phone', message: "An account with these details already exists. Try logging in." };
+            if (/phone.*(provider|signups).*disabled|unsupported phone provider/i.test(msg)) return { field: 'phone', message: "Phone sign-up isn't enabled yet. Please register with an email address." };
+            if (/rate limit/i.test(msg)) return { message: "Too many attempts. Please wait a minute and try again." };
+            if (/failed to fetch|network/i.test(msg)) return { message: "Network error — check your connection and try again." };
+            return { message: "Registration failed: " + msg };
+        }
+
+        // ---------- Submit ----------
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            hideAlert();
+            Object.keys(fields).forEach(n => touched.add(n));
+            if (!validateAll()) {
+                showToast("Check your details", "Some fields need attention.", false);
+                return;
+            }
+
+            const v = readValues();
+            const phoneE164 = v.phone ? normalizeNigerianPhone(v.phone) : null;
             const faculty = document.getElementById('faculty-input').value;
-            const department = document.getElementById('department-input').value.trim();
-            const vaultPin = document.getElementById('vault-pin-input').value.trim();
 
-            if (!fullName || !moniker || !department || !vaultPin) {
-                alert("Core Failure: All identification fields are mandatory.");
-                return;
-            }
-
-            if (vaultPin.length !== 4 || isNaN(vaultPin)) {
-                alert("Security Violation: Vault PIN must be exactly 4 numeric digits.");
-                return;
-            }
-
-            const virtualEmail = `${moniker}.blink@lasu.edu.ng`;
-            const virtualPassword = `PIN-${vaultPin}`;
-
+            setLoading(true);
             try {
-                const { data, error } = await supabaseClient.auth.signUp({
-                    email: virtualEmail,
-                    password: virtualPassword,
-                    options: {
-                        data: {
-                            full_name: fullName,
-                            moniker: "@" + moniker,
-                            identity_tier: selectedTier,
-                            faculty: faculty,
-                            department: department
-                        }
-                    }
-                });
+                const profile = {
+                    full_name: v.fullName,
+                    moniker: "@" + v.moniker,
+                    phone: phoneE164,
+                    identity_tier: selectedTier,
+                    faculty: faculty,
+                    department: v.department,
+                    vault_pin_hash: await hashPin(v.vaultPin, v.moniker),
+                    kyc_status: 'pending'
+                };
 
+                const credentials = v.email
+                    ? { email: v.email, password: v.password }
+                    : { phone: phoneE164, password: v.password };
+
+                const { data, error } = await supabaseClient.auth.signUp({ ...credentials, options: { data: profile } });
                 if (error) throw error;
 
-                sessionStorage.setItem('pending_full_name', fullName);
-                sessionStorage.setItem('pending_moniker', "@" + moniker);
+                sessionStorage.setItem('pending_full_name', v.fullName);
+                sessionStorage.setItem('pending_moniker', "@" + v.moniker);
+                if (v.email) sessionStorage.setItem('pending_email', v.email);
+                if (phoneE164) sessionStorage.setItem('pending_phone', phoneE164);
+                if (data && data.user) sessionStorage.setItem('pending_user_id', data.user.id);
 
                 if (window.navigator.vibrate) window.navigator.vibrate(60);
+                submitLabel.textContent = 'Identity Synced';
+                showToast("Account created", "Next: verify your NIN on the Security Wall.");
 
-                window.location.href = 'nin_verification.html';
-
+                setTimeout(() => { window.location.href = CONFIG.routes.afterRegister; }, 1400);
             } catch (err) {
-                console.error("Auth Exception:", err.message);
-                alert("Registration Aborted: " + err.message);
+                console.error("Auth Exception:", err);
+                const { field, message } = friendlyAuthError(err);
+                if (field) { setFieldError(field, message); fields[field].focus(); }
+                showAlert(message);
+                showToast("Registration failed", message, false);
+                setLoading(false);
             }
-        }
+        });
     </script>
 </body>
 </html>
