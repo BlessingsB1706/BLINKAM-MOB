@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlinkAm | Security Wall</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+        .glass-input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); }
+        .neon-border:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 255, 162, 0.2); outline: none; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); }
+        .step-dot.active { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+        
+        /* Shimmer animation for loading */
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 162, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-6 relative">
+
+    <div class="fixed top-12 flex gap-3 items-center">
+        <div class="step-dot active"></div>
+        <div class="w-8 h-[1px] bg-white/10"></div>
+        <div class="step-dot"></div>
+        <div class="w-8 h-[1px] bg-white/10"></div>
+        <div class="step-dot"></div>
+    </div>
+
+    <header class="text-center mb-10">
+        <div class="inline-block p-3 rounded-2xl bg-[#00ffa2]/10 mb-4 border border-[#00ffa2]/20">
+            <svg class="w-8 h-8 text-[#00ffa2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-black tracking-tight uppercase">Security Wall</h1>
+        <p class="text-gray-400 text-sm mt-2">Verify your NIN via <span class="text-white font-bold">Mono</span> to unlock the Nexus.</p>
+    </header>
+
+    <div class="w-full max-w-md glass-input p-8 rounded-[32px] relative overflow-hidden">
+        <div id="shimmer-overlay" class="absolute inset-0 shimmer hidden"></div>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="text-[10px] uppercase tracking-[0.2em] font-bold opacity-40 ml-1">National Identity Number</label>
+                <input type="text" maxlength="11" placeholder="00000000000" 
+                       class="w-full mt-2 p-5 glass-input rounded-2xl text-xl font-bold tracking-[0.3em] text-center neon-border transition-all"
+                       id="nin-input">
+            </div>
+
+            <div class="bg-white/5 p-4 rounded-xl border border-white/5 flex items-start gap-3">
+                <svg class="w-5 h-5 text-[#00ffa2] mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                <p class="text-[11px] text-gray-400 leading-relaxed">
+                    Identity verification is handled by <span class="text-white font-bold">Mono Connect</span>. Your sensitive data is encrypted and never stored on BlinkAm servers.
+                </p>
+            </div>
+
+            <button onclick="startVerification()" class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.3)] hover:scale-[1.02] active:scale-[0.98] transition">
+                Verify Identity
+            </button>
+        </div>
+    </div>
+
+    <p class="mt-8 text-[10px] uppercase tracking-widest opacity-30 font-bold">
+        Secure Handshake • 256-bit Encryption
+    </p>
+
+    <script>
+        function startVerification() {
+            const input = document.getElementById('nin-input');
+            const shimmer = document.getElementById('shimmer-overlay');
+            
+            if(input.value.length === 11) {
+                shimmer.classList.remove('hidden');
+                // Mono API Logic will be triggered here
+                console.log("Initializing Mono Connect...");
+            } else {
+                alert("Please enter a valid 11-digit NIN.");
+            }
+        }
+    </script>
+
+</body>
+</html>

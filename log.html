@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BlinkAm | Alpha Terminal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --cyan: #00ffa2; --dark-bg: #06080c; }
+        body { 
+            background: radial-gradient(circle at 50% 20%, #0f172a 0%, var(--dark-bg) 70%);
+            font-family: 'Inter', sans-serif; 
+            color: #ffffff; 
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Premium Glassmorphism Definitions */
+        .premium-glass { 
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%); 
+            backdrop-filter: blur(30px) saturate(180%); 
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .neon-input:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 255, 162, 0.15); outline: none; }
+        
+        /* Step Screen Cross-Fade Mechanics */
+        .auth-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .hidden-layer { opacity: 0; transform: scale(0.95); pointer-events: none; position: absolute; }
+
+        /* Tactile Keypad Custom Layout */
+        .num-key {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 22px; font-weight: 400; display: flex; items-center; justify-content: center;
+            transition: all 0.1s cubic-bezier(0.2, 0, 0, 1);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .num-key:active { 
+            background: rgba(0, 255, 162, 0.08); 
+            border-color: var(--cyan); 
+            color: var(--cyan); 
+            transform: scale(0.9);
+            box-shadow: 0 0 15px rgba(0, 255, 162, 0.2);
+        }
+
+        .dot-node { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.05); transition: all 0.15s ease; }
+        .dot-active { background: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 12px var(--cyan); }
+    </style>
+    <script>
+        const SUPABASE_URL = "https://efmcugpihystaytfjerg.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmbWN1Z3BpaHlzdGF5dGZqZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNjY2NTYsImV4cCI6MjA5NDY0MjY1Nn0.G53kxih4lhbo6TfnWhNTLwiP7vgnzWE-rI7G98meErc";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-6 sm:p-8 relative">
+
+    <header class="w-full max-w-md mx-auto text-center pt-6">
+        <p class="text-[9px] font-semibold tracking-[0.4em] text-slate-500 uppercase mb-1">Secure Core Gateway</p>
+        <h1 class="text-xl font-light tracking-[0.2em] text-white uppercase">BLINK<span class="font-extrabold text-[#00ffa2]">AM</span></h1>
+    </header>
+
+    <main class="w-full max-w-md mx-auto flex items-center justify-center flex-1 relative">
+        
+        <div id="step-moniker-card" class="auth-card w-full premium-glass rounded-[36px] p-8 space-y-6">
+            <div class="text-center">
+                <p class="text-[9px] font-semibold tracking-[0.3em] text-slate-400 uppercase">Vault Lock</p>
+                <h2 class="text-xl font-black mt-1 uppercase italic">Welcome Back</h2>
+                <p class="text-gray-400 text-xs mt-1">Enter your moniker terminal node to sync.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="relative">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-[#00ffa2] font-semibold text-sm">@</span>
+                    <input type="text" id="login-moniker-input" autocomplete="off"
+                           class="w-full pl-10 pr-5 py-5 bg-white/5 border border-white/5 rounded-2xl font-bold neon-input transition-all text-white placeholder:opacity-20">
+                </div>
+
+                <div class="flex items-center justify-between px-2 text-xs">
+                    <label class="flex items-center gap-2 cursor-pointer text-slate-400 select-none">
+                        <input type="checkbox" id="remember-me-toggle" class="accent-[#00ffa2] w-4 h-4 rounded">
+                        Remember terminal id
+                    </label>
+                    <a href="register.html" class="text-slate-500 hover:text-white font-medium transition-colors">Forgot identifier?</a>
+                </div>
+
+                <button onclick="advanceToPINStep()" class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-xs uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.2)] mt-2 active:scale-[0.98] transition-transform">
+                    Verify Identifier →
+                </button>
+            </div>
+            
+            <div class="text-center pt-2 border-t border-white/5">
+                <p class="text-xs text-slate-500">New around here? <a href="register.html" class="text-[#00ffa2] font-bold hover:underline ml-1">Setup Account</a></p>
+            </div>
+        </div>
+
+        <div id="step-pin-card" class="auth-card w-full premium-glass rounded-[36px] p-6 flex flex-col justify-between hidden-layer min-h-[460px]">
+            <div class="text-center mt-2">
+                <button onclick="reverseToMonikerStep()" class="text-[9px] font-semibold tracking-widest text-slate-500 hover:text-white uppercase transition-colors mb-2">← Change Moniker</button>
+                <h2 id="pin-card-greeting" class="text-md font-semibold text-white/90 tracking-wide">@EMPEROR</h2>
+                
+                <div class="flex justify-center gap-5 mt-4">
+                    <div class="dot-node" id="node-0"></div>
+                    <div class="dot-node" id="node-1"></div>
+                    <div class="dot-node" id="node-2"></div>
+                    <div class="dot-node" id="node-3"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-x-6 gap-y-3 max-w-[240px] mx-auto pb-4 justify-items-center items-center">
+                <button onclick="appendDigit('1')" class="num-key">1</button>
+                <button onclick="appendDigit('2')" class="num-key">2</button>
+                <button onclick="appendDigit('3')" class="num-key">3</button>
+                
+                <button onclick="appendDigit('4')" class="num-key">4</button>
+                <button onclick="appendDigit('5')" class="num-key">5</button>
+                <button onclick="appendDigit('6')" class="num-key">6</button>
+                
+                <button onclick="appendDigit('7')" class="num-key">7</button>
+                <button onclick="appendDigit('8')" class="num-key">8</button>
+                <button onclick="appendDigit('9')" class="num-key">9</button>
+                
+                <button onclick="flushPIN()" class="num-key !text-[10px] font-semibold text-slate-500 uppercase border-transparent bg-transparent active:!bg-transparent active:!text-white">Clear</button>
+                <button onclick="appendDigit('0')" class="num-key">0</button>
+                <button onclick="popDigit()" class="num-key !border-transparent bg-transparent text-slate-500 active:!bg-transparent active:!text-white flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414A2 2 0 0010.828 19H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z"></path></svg>
+                </button>
+            </div>
+            <div></div>
+        </div>
+
+    </main>
+
+    <footer class="w-full text-center pb-4">
+        <p id="system-status-log" class="text-[8px] text-slate-600 font-medium uppercase tracking-[0.3em]">BlinkAm Guard System Protocol v2.5</p>
+    </footer>
+
+    <script>
+        let pinPayload = "";
+        let targetMoniker = "";
+        const statusLog = document.getElementById('system-status-log');
+
+        // Check for local storage parameters upon boot loading
+        document.addEventListener("DOMContentLoaded", () => {
+            const rememberedID = localStorage.getItem('remembered_blink_moniker');
+            if (rememberedID) {
+                document.getElementById('login-moniker-input').value = rememberedID;
+                document.getElementById('remember-me-toggle').checked = true;
+            }
+        });
+
+        function advanceToPINStep() {
+            const inputField = document.getElementById('login-moniker-input');
+            targetMoniker = inputField.value.trim().toLowerCase();
+
+            if (!targetMoniker) {
+                alert("Core Error: Moniker input string space empty.");
+                return;
+            }
+
+            // Save state preference if check is toggled
+            if (document.getElementById('remember-me-toggle').checked) {
+                localStorage.setItem('remembered_blink_moniker', targetMoniker);
+            } else {
+                localStorage.removeItem('remembered_blink_moniker');
+            }
+
+            // Execution cross-fade animations
+            document.getElementById('step-moniker-card').classList.add('hidden-layer');
+            document.getElementById('step-pin-card').classList.remove('hidden-layer');
+            document.getElementById('pin-card-greeting').innerText = "@" + targetMoniker.toUpperCase();
+            triggerHaptic(40);
+        }
+
+        function reverseToMonikerStep() {
+            document.getElementById('step-pin-card').classList.add('hidden-layer');
+            document.getElementById('step-moniker-card').classList.remove('hidden-layer');
+            triggerHaptic(30);
+            flushPIN();
+        }
+
+        function appendDigit(val) {
+            if (pinPayload.length < 4) {
+                pinPayload += val;
+                triggerHaptic(35);
+                syncDisplayNodes();
+                
+                if (pinPayload.length === 4) {
+                    setTimeout(executeLiveProductionSignIn, 200);
+                }
+            }
+        }
+
+        function popDigit() {
+            if (pinPayload.length > 0) {
+                pinPayload = pinPayload.slice(0, -1);
+                triggerHaptic(20);
+                syncDisplayNodes();
+            }
+        }
+
+        function flushPIN() {
+            pinPayload = "";
+            triggerHaptic(50);
+            syncDisplayNodes();
+        }
+
+        function syncDisplayNodes() {
+            for (let idx = 0; idx < 4; idx++) {
+                const node = document.getElementById(`node-${idx}`);
+                if (idx < pinPayload.length) {
+                    node.classList.add('dot-active');
+                } else {
+                    node.classList.remove('dot-active');
+                }
+            }
+        }
+
+        async function executeLiveProductionSignIn() {
+            statusLog.innerText = "Querying credentials against security database...";
+            statusLog.style.color = "#ffaa00";
+
+            // Reconstruct the unique backend identifiers based on registration blueprints
+            const targetEmail = `${targetMoniker}.blink@lasu.edu.ng`;
+            const mappedPassword = `PIN-${pinPayload}`;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: targetEmail,
+                    password: mappedPassword
+                });
+
+                if (error) throw error;
+
+                // Sync UI elements
+                triggerHaptic([60, 40, 60]);
+                statusLog.innerText = "ACCESS GRANTED • VAULT UNLOCKED";
+                statusLog.style.color = "var(--cyan)";
+
+                // Cache active workspace handles inside session tracking
+                sessionStorage.setItem('mono_nin_name', data.user.user_metadata.full_name || targetMoniker);
+                
+                setTimeout(() => {
+                    window.location.href = 'home_feed.html';
+                }, 600);
+
+            } catch (err) {
+                console.error("Auth Rejection:", err.message);
+                triggerHaptic([150, 80, 150]);
+                statusLog.innerText = "ACCESS DENIED • SECURITY REJECTION";
+                statusLog.style.color = "#ff4444";
+
+                // Error UI Shake effect trigger
+                const targetNodes = document.querySelectorAll('.dot-node');
+                targetNodes.forEach(n => {
+                    n.style.borderColor = '#ff4444';
+                    n.style.boxShadow = '0 0 8px #ff4444';
+                });
+                
+                setTimeout(() => {
+                    targetNodes.forEach(n => {
+                        n.style.borderColor = '';
+                        n.style.boxShadow = '';
+                    });
+                    flushPIN();
+                }, 400);
+            }
+        }
+
+        function triggerHaptic(cadence) {
+            if (window.navigator.vibrate) window.navigator.vibrate(cadence);
+        }
+    </script>
+</body>
+</html>

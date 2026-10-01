@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlinkAm | The Iris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-cyan: #00ffa2; --neon-amber: #ffaa00; --neon-red: #ff4444; --deep-bg: #0b0e14; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+        
+        .glass-input { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 20px; outline: none; transition: 0.3s; width: 100%; }
+        .glass-input:focus { border-color: var(--neon-cyan); background: rgba(255, 255, 255, 0.05); }
+
+        /* Custom Urgency Slider */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 10px; }
+        input[type=range]::-webkit-slider-thumb { height: 24px; width: 24px; border-radius: 50%; background: var(--neon-cyan); cursor: pointer; -webkit-appearance: none; margin-top: -9px; box-shadow: 0 0 15px var(--neon-cyan); transition: 0.3s; }
+
+        .btn-glow { box-shadow: 0 0 20px rgba(0, 255, 162, 0.2); transition: 0.3s; }
+        .btn-glow:active { transform: scale(0.95); opacity: 0.8; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-6 pt-12">
+
+    <header class="flex justify-between items-center mb-10">
+        <button onclick="history.back()" class="opacity-40 hover:opacity-100 text-xs font-black uppercase tracking-[0.2em]">✕ Close</button>
+        <div class="text-center">
+            <h1 class="text-[10px] font-black tracking-[0.4em] opacity-30 uppercase">Request Portal</h1>
+            <p class="text-lg font-black italic uppercase">The Iris</p>
+        </div>
+        <div class="w-10"></div> 
+    </header>
+
+    <main class="flex-1 space-y-8 overflow-y-auto no-scrollbar pb-24">
+        
+        <section>
+            <label class="text-[10px] font-black uppercase tracking-widest opacity-30 ml-4 mb-3 block">Category</label>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar">
+                <button class="glass-input !py-3 !px-6 text-[10px] font-bold border-[#00ffa2] text-[#00ffa2] whitespace-nowrap">LOGISTICS</button>
+                <button class="glass-input !py-3 !px-6 text-[10px] font-bold opacity-40 whitespace-nowrap">ACADEMIC</button>
+                <button class="glass-input !py-3 !px-6 text-[10px] font-bold opacity-40 whitespace-nowrap">TECH GIG</button>
+            </div>
+        </section>
+
+        <section>
+            <label class="text-[10px] font-black uppercase tracking-widest opacity-30 ml-4 mb-3 block">What do you need?</label>
+            <textarea class="glass-input h-32 resize-none text-sm leading-relaxed" placeholder="e.g. Help me pick up my matric gown at the auditorium..."></textarea>
+        </section>
+
+        <section class="glass-input space-y-6">
+            <div class="flex justify-between items-center">
+                <label class="text-[10px] font-black uppercase tracking-widest opacity-30">Urgency Level</label>
+                <span id="urgency-label" class="text-[10px] font-black text-[#00ffa2] uppercase tracking-widest">Chill</span>
+            </div>
+            <input type="range" id="urgency-slider" min="1" max="3" step="1" value="1" oninput="updateUrgency(this.value)">
+            <div class="flex justify-between opacity-20 text-[8px] font-bold uppercase tracking-tighter">
+                <span>Relaxed</span>
+                <span>Standard</span>
+                <span>Immediate</span>
+            </div>
+        </section>
+
+        <section class="flex gap-4">
+            <div class="flex-1">
+                <label class="text-[10px] font-black uppercase tracking-widest opacity-30 ml-4 mb-3 block">Bounty (₦)</label>
+                <input type="number" id="bounty-input" class="glass-input text-xl font-black italic" value="500">
+            </div>
+            <div class="w-1/3">
+                <label class="text-[10px] font-black uppercase tracking-widest opacity-30 ml-4 mb-3 block">Fee (⚡)</label>
+                <div class="glass-input text-sm font-black text-[#00ffa2] flex items-center justify-center">
+                    <span id="blink-fee">10</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#0b0e14] to-transparent">
+        <button onclick="broadcastPulse()" id="broadcast-btn" class="w-full bg-[#00ffa2] text-black py-6 rounded-[24px] font-black text-xs uppercase tracking-[0.3em] btn-glow">
+            Broadcast Pulse
+        </button>
+    </footer>
+
+    <script>
+        function updateUrgency(val) {
+            const label = document.getElementById('urgency-label');
+            const btn = document.getElementById('broadcast-btn');
+            const fee = document.getElementById('blink-fee');
+            const bountyInput = document.getElementById('bounty-input');
+            const root = document.documentElement;
+            
+            if(val == 1) {
+                label.innerText = "Chill";
+                label.style.color = "#00ffa2";
+                btn.style.backgroundColor = "#00ffa2";
+                fee.innerText = "10";
+                fee.parentElement.style.color = "#00ffa2";
+                root.style.setProperty('--neon-cyan', '#00ffa2');
+                if(bountyInput.value < 500) bountyInput.value = 500;
+            } else if(val == 2) {
+                label.innerText = "Priority";
+                label.style.color = "#ffaa00";
+                btn.style.backgroundColor = "#ffaa00";
+                fee.innerText = "25";
+                fee.parentElement.style.color = "#ffaa00";
+                root.style.setProperty('--neon-cyan', '#ffaa00');
+                if(bountyInput.value < 1000) bountyInput.value = 1000;
+            } else {
+                label.innerText = "Critical";
+                label.style.color = "#ff4444";
+                btn.style.backgroundColor = "#ff4444";
+                fee.innerText = "50";
+                fee.parentElement.style.color = "#ff4444";
+                root.style.setProperty('--neon-cyan', '#ff4444');
+                if(bountyInput.value < 2000) bountyInput.value = 2000;
+            }
+        }
+
+        function broadcastPulse() {
+            if (window.navigator.vibrate) window.navigator.vibrate(100);
+            alert("Pulse Broadcasted to the Retina.");
+            window.location.href = 'home_feed.html';
+        }
+    </script>
+</body>
+</html>

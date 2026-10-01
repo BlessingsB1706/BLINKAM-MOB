@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlinkAm | The Retina v5.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; --neon-amber: #ffaa00; --neon-red: #ff4444; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+        
+        /* Layout Structure */
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
+        .feed-container { height: calc(100vh - 180px); overflow-y: auto; scroll-behavior: smooth; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Pulses & Notifications */
+        .pulse-notif { position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: var(--neon-red); border-radius: 50%; border: 2px solid var(--deep-bg); animation: notify 1.5s infinite; }
+        @keyframes notify { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.5); } 70% { transform: scale(1.3); box-shadow: 0 0 0 10px rgba(255, 68, 68, 0); } 100% { transform: scale(1); } }
+        
+        .pulse-critical { animation: critical 2s infinite; }
+        @keyframes critical { 0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.2); } 50% { box-shadow: 0 0 0 8px rgba(255, 68, 68, 0.1); } 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); } }
+
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(11, 14, 20, 0.96); backdrop-filter: blur(20px); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; pointer-events: none; transform: scale(0.95); }
+        .modal-active { opacity: 1; pointer-events: auto; transform: scale(1); }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="p-6 pt-10 flex justify-between items-center z-50 bg-[#0b0e14]">
+        <div class="relative cursor-pointer" onclick="openModal('profile-modal')">
+            <h1 class="text-[10px] font-black tracking-[0.3em] opacity-40 uppercase">The Retina</h1>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-xl font-black italic uppercase">@Emperor</span>
+                <div class="relative w-3 h-3">
+                    <span class="w-2 h-2 rounded-full bg-[#00ffa2] block"></span>
+                    <div class="pulse-notif"></div>
+                </div>
+            </div>
+        </div>
+        <button onclick="openModal('vault-modal')" class="glass-card px-4 py-2 rounded-2xl flex flex-col items-end border-white/5 active:scale-95 transition">
+            <span class="text-[8px] font-bold opacity-40 uppercase tracking-widest">Nexus Credits</span>
+            <span class="text-sm font-black text-[#00ffa2]">1,250 ⚡</span>
+        </button>
+    </header>
+
+    <nav class="px-6 mb-4 flex gap-6 overflow-x-auto no-scrollbar text-[10px] font-black uppercase tracking-widest opacity-60">
+        <button onclick="filterTasks('all')" class="tab-btn border-b-2 border-[#00ffa2] text-[#00ffa2] pb-2">All Pulses</button>
+        <button onclick="filterTasks('academic')" class="tab-btn pb-2">Academic</button>
+        <button onclick="filterTasks('tech')" class="tab-btn pb-2">Tech Gigs</button>
+    </nav>
+
+    <main class="feed-container px-6 space-y-4 no-scrollbar">
+        <div class="task-card logistics glass-card p-5 rounded-[30px] border-l-4 border-red-500 pulse-critical">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-red-500 to-orange-500"></div>
+                    <div>
+                        <p class="text-[10px] font-bold">@Vissionary</p>
+                        <p id="timer-1" class="text-[8px] text-[#ff4444] font-black uppercase">Expiring: 14:59</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-[8px] font-black opacity-30 block uppercase tracking-widest">Route</span>
+                    <span class="text-[10px] font-black text-white">Senate → LT1</span>
+                </div>
+            </div>
+            <h3 class="text-sm font-bold mb-4">Urgent: Need 3 sets of ENG107 Manuals.</h3>
+            <div class="flex justify-between items-center">
+                <span class="text-lg font-black italic tracking-tighter">₦2,500</span>
+                <button onclick="openModal('chat-portal')" class="bg-white text-black px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest active:scale-90 transition">Accept Blink</button>
+            </div>
+        </div>
+
+        <div class="task-card academic glass-card p-5 rounded-[30px]">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-500"></div>
+                    <span class="text-[10px] font-bold">@BlinkMaster</span>
+                </div>
+                <span class="text-[9px] font-black text-[#00ffa2] opacity-40 uppercase">Normal</span>
+            </div>
+            <h3 class="text-sm font-bold mb-4 leading-relaxed">Pickup photocopies at the gate and drop at Dept.</h3>
+            <div class="flex justify-between items-center">
+                <span class="text-lg font-black italic tracking-tighter">₦800</span>
+                <button onclick="openModal('chat-portal')" class="glass-card px-6 py-2 rounded-full text-[10px] font-black border-white/10 uppercase tracking-widest active:scale-90 transition">Accept Blink</button>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 w-full p-5 flex justify-around items-center bg-[#0b0e14]/90 backdrop-blur-xl border-t border-white/5 z-50">
+        <button onclick="location.reload()" class="text-[#00ffa2]"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg></button>
+        <button onclick="location.href='iris.html'" class="bg-[#00ffa2] text-black p-4 rounded-full -mt-14 shadow-[0_0_30px_rgba(0,255,162,0.4)] border-4 border-[#0b0e14] transform hover:scale-105 active:scale-90 transition">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+        </button>
+        <button onclick="openModal('leaderboard-modal')" class="opacity-40 hover:opacity-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></button>
+        <button onclick="openModal('vault-modal')" class="opacity-40 hover:opacity-100 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></button>
+    </nav>
+
+    <div id="vault-modal" class="modal-overlay">
+        <div class="glass-card w-full max-w-sm rounded-[40px] p-8 border-[#00ffa2]/20">
+            <h2 class="text-2xl font-black italic uppercase mb-8">The <span class="text-[#00ffa2]">Vault</span></h2>
+            <div class="space-y-4">
+                <div class="bg-white/5 p-6 rounded-3xl border border-white/5">
+                    <span class="text-[10px] font-black opacity-30 uppercase tracking-[0.2em]">Available Cash</span>
+                    <p id="cash-balance-display" class="text-3xl font-black mt-1">₦12,450.00</p>
+                    <button onclick="triggerWithdrawal()" class="text-[9px] font-bold text-[#00ffa2] mt-2 uppercase tracking-widest">Withdraw Funds →</button>
+                </div>
+                <div class="bg-[#00ffa2]/5 p-6 rounded-3xl border border-[#00ffa2]/10">
+                    <span class="text-[10px] font-black text-[#00ffa2] uppercase tracking-[0.2em]">Blink Credits</span>
+                    <p class="text-3xl font-black mt-1">1,250 ⚡</p>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button onclick="alert('Redeeming Data Protocol...')" class="bg-[#00ffa2]/10 p-3 rounded-xl text-[9px] font-black uppercase text-[#00ffa2] border border-[#00ffa2]/20">Redeem Data</button>
+                        <button onclick="alert('Priority Boost Applied!')" class="bg-[#00ffa2]/10 p-3 rounded-xl text-[9px] font-black uppercase text-[#00ffa2] border border-[#00ffa2]/20">Priority Boost</button>
+                    </div>
+                </div>
+                <button onclick="triggerPaystack()" class="w-full py-5 bg-[#00ffa2] text-black rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl">+ Fund Nexus Wallet</button>
+            </div>
+            <button onclick="closeModal('vault-modal')" class="w-full mt-6 py-4 text-xs font-bold opacity-30 uppercase">Close</button>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal-overlay">
+        <div class="glass-card w-full max-w-sm rounded-[40px] p-8 border-white/10 text-center">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-[#00ffa2] to-blue-600 mx-auto mb-4 p-1 shadow-2xl">
+                <div class="w-full h-full rounded-full bg-[#0b0e14] flex items-center justify-center font-black text-3xl italic">E</div>
+            </div>
+            <h2 class="text-2xl font-black italic uppercase">@Emperor</h2>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-1">Computer Science • Year 2</p>
+            <div class="mt-8 flex justify-center gap-6 border-y border-white/5 py-6">
+                <div class="text-center"><p class="text-xl font-black text-[#00ffa2]">98%</p><p class="text-[8px] opacity-40 uppercase font-black">Karma Index</p></div>
+                <div class="text-center"><p class="text-xl font-black">42</p><p class="text-[8px] opacity-40 uppercase font-black">Handshakes</p></div>
+            </div>
+            <div class="mt-6 flex justify-center gap-2">
+                <span class="bg-[#00ffa2]/10 px-3 py-1 rounded-full text-[9px] font-black text-[#00ffa2] uppercase">Top Earner</span>
+                <span class="bg-white/5 px-3 py-1 rounded-full text-[9px] font-black uppercase">Verified</span>
+            </div>
+            <button onclick="closeModal('profile-modal')" class="w-full mt-10 py-5 bg-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest">Dismiss</button>
+        </div>
+    </div>
+
+    <div id="leaderboard-modal" class="modal-overlay">
+        <div class="glass-card w-full max-w-sm rounded-[40px] p-8 border-white/5 text-center">
+            <h2 class="text-xl font-black italic uppercase mb-6 italic uppercase tracking-widest">Top <span class="text-[#00ffa2]">Blinkers</span></h2>
+            <div class="space-y-4 text-left">
+                <div class="flex justify-between items-center bg-[#00ffa2]/10 p-4 rounded-2xl border border-[#00ffa2]/20"><span class="text-sm font-black italic">1. @Emperor</span><span class="text-sm font-black text-[#00ffa2]">₦84.2k</span></div>
+                <div class="flex justify-between items-center p-4 opacity-40 border-b border-white/5"><span class="text-sm font-bold">2. @Vissionary</span><span class="text-sm font-bold">₦62.1k</span></div>
+                <div class="flex justify-between items-center p-4 opacity-30 border-b border-white/5"><span class="text-sm font-bold">3. @BlinkMaster</span><span class="text-sm font-bold">₦59.8k</span></div>
+            </div>
+            <button onclick="closeModal('leaderboard-modal')" class="w-full mt-6 py-4 text-xs font-bold opacity-30 uppercase">Dismiss</button>
+        </div>
+    </div>
+
+    <div id="chat-portal" class="modal-overlay !p-0">
+        <div class="flex flex-col h-full w-full bg-[#0b0e14]">
+            <div class="p-6 pt-12 glass-card flex justify-between items-center border-b border-white/5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-red-500 shadow-lg shadow-red-500/20"></div>
+                    <div><p class="text-xs font-black uppercase italic">@Vissionary</p><p class="text-[8px] text-[#00ffa2] font-black uppercase tracking-widest">Mission Active</p></div>
+                </div>
+                <button onclick="closeModal('chat-portal')" class="text-[10px] font-black opacity-40 uppercase">Exit</button>
+            </div>
+            <div id="chat-box" class="flex-1 p-6 space-y-4 overflow-y-auto no-scrollbar">
+                <div class="glass-card p-4 rounded-3xl rounded-bl-none max-w-[80%] border-white/5"><p class="text-xs leading-relaxed">I'm at the Senate building now. Which LT1?</p></div>
+                <div class="bg-[#00ffa2]/10 p-4 rounded-3xl rounded-br-none max-w-[80%] ml-auto border border-[#00ffa2]/20"><p class="text-xs text-[#00ffa2]">The old one, near Faculty of Science.</p></div>
+            </div>
+            <div class="p-6 glass-card border-t border-white/5 space-y-4">
+                <div class="flex gap-2">
+                    <input type="file" id="proof-upload" class="hidden" onchange="confirmUpload()">
+                    <button onclick="document.getElementById('proof-upload').click()" class="flex-1 py-4 glass-card rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>Upload Proof</button>
+                    <button onclick="openHandshakeOptions()" id="handshake-btn" class="flex-1 py-4 bg-[#00ffa2] text-black rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] opacity-40 cursor-not-allowed transition">Handshake</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="chat-input" placeholder="Pulse message..." class="flex-1 bg-white/5 border border-white/5 rounded-2xl px-5 py-4 text-xs outline-none focus:border-[#00ffa2]/30 transition">
+                    <button onclick="sendMessage()" class="bg-[#00ffa2] p-4 rounded-2xl text-black active:scale-90 transition"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="handshake-options" class="modal-overlay">
+        <div class="glass-card w-full max-w-sm rounded-[40px] p-10 border-[#00ffa2]/30 text-center">
+            <h2 class="text-xl font-black italic uppercase mb-2">Verification</h2>
+            <div class="grid grid-cols-1 gap-4 mt-8">
+                <button onclick="openModal('qr-modal')" class="glass-card p-4 rounded-3xl flex items-center gap-4"><div class="bg-[#00ffa2] p-2 rounded-lg text-black">QR</div><p class="text-[10px] font-black uppercase">Scan QR Code</p></button>
+                <button onclick="openModal('hash-modal')" class="glass-card p-4 rounded-3xl flex items-center gap-4"><div class="bg-[#ffaa00] p-2 rounded-lg text-black">#</div><p class="text-[10px] font-black uppercase">Identity Hash Code</p></button>
+            </div>
+            <button onclick="closeModal('handshake-options')" class="mt-8 text-[9px] font-black opacity-30 uppercase">Back</button>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal-overlay"><div class="glass-card w-full max-w-sm rounded-[40px] p-10 text-center"><h2 class="text-xl font-black italic uppercase mb-2 text-[#00ffa2]">Secure QR</h2><div class="bg-white p-4 rounded-3xl inline-block my-8"><div class="w-40 h-40 bg-[#0b0e14] rounded-xl flex items-center justify-center text-[#00ffa2] font-black">QR ICON</div></div><button onclick="closeModal('qr-modal')" class="w-full py-4 text-xs font-black opacity-30 uppercase">Cancel</button></div></div>
+    <div id="hash-modal" class="modal-overlay"><div class="glass-card w-full max-w-sm rounded-[40px] p-10 text-center"><h2 class="text-xl font-black italic uppercase mb-2 text-[#ffaa00]">Hash Verified</h2><input type="text" placeholder="0 0 0 0 0 0" class="w-full bg-white/5 border border-white/5 rounded-2xl p-6 text-center text-2xl font-black tracking-[0.5em] mb-8 focus:border-[#ffaa00]/50 outline-none"><button onclick="alert('Payment Released!')" class="w-full py-5 bg-[#ffaa00] text-black rounded-2xl font-black text-xs uppercase shadow-xl">Confirm Release</button><button onclick="closeModal('hash-modal')" class="mt-4 text-[9px] font-black opacity-30 uppercase">Cancel</button></div></div>
+
+    <script>
+        // CORE LOGIC
+        function openModal(id) {
+            closeAllModals();
+            const modal = document.getElementById(id);
+            if(modal) modal.classList.add('modal-active');
+        }
+        function closeModal(id) { document.getElementById(id).classList.remove('modal-active'); }
+        function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('modal-active')); }
+
+        function openHandshakeOptions() {
+            if(!document.getElementById('handshake-btn').classList.contains('cursor-not-allowed')) {
+                openModal('handshake-options');
+            }
+        }
+
+        function confirmUpload() {
+            document.getElementById('handshake-btn').classList.remove('opacity-40', 'cursor-not-allowed');
+            alert("Proof Uploaded. Handshake Protocol Enabled.");
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const box = document.getElementById('chat-box');
+            if(input.value.trim()) {
+                const msg = document.createElement('div');
+                msg.className = "bg-[#00ffa2]/10 p-4 rounded-3xl rounded-br-none max-w-[80%] ml-auto border border-[#00ffa2]/20";
+                msg.innerHTML = `<p class="text-xs text-[#00ffa2] leading-relaxed">${input.value}</p>`;
+                box.appendChild(msg);
+                input.value = "";
+                box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+            }
+        }
+
+        // PAYSTACK FUNDING
+        function triggerPaystack() {
+            const fundAmount = prompt("Enter amount to fund (₦):", "1000");
+            if (!fundAmount || isNaN(fundAmount) || fundAmount <= 0) return;
+
+            let handler = PaystackPop.setup({
+                key: 'pk_test_078d5dfbcc0b0483046373b5d1db6960b3082648',
+                email: "mubaarak.hassan@lasu.edu.ng",
+                amount: fundAmount * 100,
+                currency: "NGN",
+                callback: function(response) {
+                    closeModal('vault-modal');
+                    const display = document.getElementById('cash-balance-display');
+                    let currentVal = parseInt(display.innerText.replace(/[₦,.]/g, '')) || 0;
+                    display.innerText = "₦" + (currentVal + parseInt(fundAmount)).toLocaleString() + ".00";
+                    alert('Nexus Wallet Synced!');
+                }
+            });
+            handler.openIframe();
+        }
+
+        function triggerWithdrawal() {
+            const amount = prompt("Enter amount to withdraw to bank:");
+            if(amount) alert("Withdrawal request for ₦" + amount + " submitted to Nexus processing.");
+        }
+
+        // TIMER
+        let timeLeft = 899;
+        setInterval(() => {
+            if(timeLeft > 0) {
+                timeLeft--;
+                const min = Math.floor(timeLeft / 60);
+                const sec = timeLeft % 60;
+                const t = document.getElementById('timer-1');
+                if(t) t.innerText = `Expiring: ${min}:${sec < 10 ? '0' : ''}${sec}`;
+            }
+        }, 1000);
+
+        function filterTasks(cat) {
+            document.querySelectorAll('.task-card').forEach(card => card.style.display = (cat === 'all' || card.classList.contains(cat)) ? 'block' : 'none');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('border-b-2', 'border-[#00ffa2]', 'text-[#00ffa2]'));
+            event.currentTarget.classList.add('border-b-2', 'border-[#00ffa2]', 'text-[#00ffa2]');
+        }
+    </script>
+</body>
+</html>

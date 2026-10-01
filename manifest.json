@@ -1,0 +1,27 @@
+{
+  "name": "BlinkAm - The Pulse of LASU",
+  "short_name": "BlinkAm",
+  "description": "The first hyper-local task protocol built for LASUites. Secure. Cinematic. Instant.",
+  "start_url": "/BlinkAm_Landing_page.html",
+  "display": "standalone",
+  "background_color": "#0b0e14",
+  "theme_color": "#00ffa2",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": []
+}

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlinkAm | Account Setup</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .neon-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 255, 162, 0.15); outline: none; }
+        .role-card { transition: all 0.3s ease; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .role-card.selected { border-color: var(--neon-cyan); background: rgba(0, 255, 162, 0.05); }
+        
+        /* Custom Select Styling */
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2300ffa2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+    </style>
+    <script>
+        // BlinkAm Unified Production Backend Configuration
+        const SUPABASE_URL = "https://efmcugpihystaytfjerg.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVmbWN1Z3BpaHlzdGF5dGZqZXJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkwNjY2NTYsImV4cCI6MjA5NDY0MjY1Nn0.G53kxih4lhbo6TfnWhNTLwiP7vgnzWE-rI7G98meErc";
+        
+        // FIXED: Prefixed explicitly with the parent 'supabase' object initialization wrapper
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+</head>
+<body class="min-h-screen flex flex-col p-6 max-w-lg mx-auto pb-20">
+
+    <header class="mt-8 mb-10 flex justify-between items-center">
+        <h1 class="text-2xl font-black italic tracking-tighter">BLINK<span class="text-[#00ffa2]">AM</span></h1>
+        <div class="text-[10px] font-bold tracking-widest text-[#00ffa2] bg-[#00ffa2]/10 px-3 py-1 rounded-full border border-[#00ffa2]/20">
+            STEP 01/03
+        </div>
+    </header>
+
+    <main class="space-y-8">
+        <div>
+            <h2 class="text-3xl font-black leading-tight uppercase">Create <br>Account</h2>
+            <p class="text-gray-400 text-sm mt-2">Provide your legal details to sync with the <span class="text-white font-bold">Security Wall</span>.</p>
+        </div>
+
+        <form id="registration-form" class="space-y-5">
+            <div>
+                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Full Legal Name (As on NIN)</label>
+                <input type="text" id="legal-name-input" required
+                       class="w-full mt-2 p-5 glass-panel rounded-2xl font-bold neon-input transition-all placeholder:opacity-20 text-white">
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Moniker (Display Name)</label>
+                <div class="relative mt-2">
+                    <span class="absolute left-5 top-1/2 -translate-y-1/2 text-[#00ffa2] font-bold">@</span>
+                    <input type="text" id="moniker-input" required
+                           class="w-full pl-10 pr-5 py-5 glass-panel rounded-2xl font-bold neon-input transition-all text-white">
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Identity Tier</label>
+                <div class="grid grid-cols-2 gap-4 mt-2">
+                    <div id="tier-student" class="role-card p-4 rounded-2xl text-center selected" onclick="selectRole('Student', this)">
+                        <span class="block text-xs font-black uppercase">Student</span>
+                    </div>
+                    <div id="tier-staff" class="role-card p-4 rounded-2xl text-center" onclick="selectRole('Staff', this)">
+                        <span class="block text-xs font-black uppercase">Staff</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Faculty</label>
+                    <select id="faculty-input" class="w-full mt-2 p-4 glass-panel rounded-2xl font-bold neon-input text-xs text-white bg-[#0b0e14]">
+                        <option>Faculty of Arts</option>
+                        <option>Faculty of Education</option>
+                        <option>Faculty of Law</option>
+                        <option>Faculty of Management Sciences</option>
+                        <option>Faculty of Science</option>
+                        <option>Faculty of Social Sciences</option>
+                        <option>Faculty of Computing and Information Technology</option>
+                        <option>School of Communication</option>
+                        <option>School of Transport</option>
+                        <option>Faculty of Engineering</option>
+                        <option>Faculty of Agriculture</option>
+                        <option>Faculty of Environmental Sciences</option>
+                        <option>Lagos State University College of Medicine (LASUCOM)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Department</label>
+                    <input type="text" id="department-input" required
+                           class="w-full mt-2 p-4 glass-panel rounded-2xl font-bold neon-input text-xs text-white">
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase tracking-widest font-black opacity-30 ml-1">Secure Vault PIN (4 Digits)</label>
+                <input type="password" id="vault-pin-input" placeholder="••••" required
+                       pattern="[0-9]*" inputmode="numeric" maxlength="4"
+                       class="w-full mt-2 p-5 glass-panel rounded-2xl font-bold text-center tracking-[1em] text-xl text-[#00ffa2] neon-input transition-all">
+            </div>
+
+            <button type="button" onclick="executeProductionSignUp()" 
+                    class="w-full py-5 bg-[#00ffa2] text-[#0b0e14] rounded-2xl font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.3)] mt-6 active:scale-[0.98] transition-transform">
+                Continue to NIN Sync
+            </button>
+
+            <div class="text-center mt-6">
+                <p class="text-xs text-gray-500 font-medium">
+                    Already authenticated? 
+                    <a href="log.html" class="text-[#00ffa2] hover:underline font-bold tracking-wide uppercase text-[10px] ml-1">Open login →</a>
+                </p>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        let selectedTier = "Student";
+
+        function selectRole(tierValue, element) {
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedTier = tierValue;
+        }
+
+        async function executeProductionSignUp() {
+            const fullName = document.getElementById('legal-name-input').value.trim();
+            const moniker = document.getElementById('moniker-input').value.trim().toLowerCase();
+            const faculty = document.getElementById('faculty-input').value;
+            const department = document.getElementById('department-input').value.trim();
+            const vaultPin = document.getElementById('vault-pin-input').value.trim();
+
+            if (!fullName || !moniker || !department || !vaultPin) {
+                alert("Core Failure: All identification fields are mandatory.");
+                return;
+            }
+
+            if (vaultPin.length !== 4 || isNaN(vaultPin)) {
+                alert("Security Violation: Vault PIN must be exactly 4 numeric digits.");
+                return;
+            }
+
+            const virtualEmail = `${moniker}.blink@lasu.edu.ng`;
+            const virtualPassword = `PIN-${vaultPin}`;
+
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: virtualEmail,
+                    password: virtualPassword,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            moniker: "@" + moniker,
+                            identity_tier: selectedTier,
+                            faculty: faculty,
+                            department: department
+                        }
+                    }
+                });
+
+                if (error) throw error;
+
+                sessionStorage.setItem('pending_full_name', fullName);
+                sessionStorage.setItem('pending_moniker', "@" + moniker);
+
+                if (window.navigator.vibrate) window.navigator.vibrate(60);
+
+                window.location.href = 'nin_verification.html';
+
+            } catch (err) {
+                console.error("Auth Exception:", err.message);
+                alert("Registration Aborted: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

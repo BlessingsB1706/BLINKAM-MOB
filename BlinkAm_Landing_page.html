@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlinkAm | The Pulse of LASU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="The first hyper-local task protocol built for LASUites. Secure. Cinematic. Instant.">
+    <meta name="theme-color" content="#00ffa2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BlinkAm">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/jpg" href="/icon-192.jpg">
+    <link rel="apple-touch-icon" href="/icon-192.jpg">
+    <style>
+        :root { --neon-cyan: #00ffa2; --deep-bg: #0b0e14; --neon-amber: #ffaa00; }
+        body { background-color: var(--deep-bg); font-family: 'Inter', sans-serif; color: white; overflow-x: hidden; }
+        
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .neon-text { color: var(--neon-cyan); text-shadow: 0 0 10px rgba(0, 255, 162, 0.5); }
+        
+        /* Floating Task Card Animation */
+        .task-card-float {
+            animation: float 6s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(255, 170, 0, 0.2);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(-1deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
+        }
+
+        /* Marquee for Ticker */
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .animate-marquee { display: flex; animation: marquee 25s linear infinite; width: max-content; }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed top-0 w-full p-5 flex justify-between items-center z-50 glass border-b border-white/5">
+        <div class="text-xl font-black italic">BLINK<span class="neon-text">AM</span></div>
+        <div class="hidden md:flex space-x-6 text-[10px] uppercase tracking-[0.2em] font-bold opacity-60">
+            <a href="#retina" class="hover:text-[#00ffa2]">Retina Feed</a>
+            <a href="#vault" class="hover:text-[#00ffa2]">The Vault</a>
+            <a href="#support" class="hover:text-[#00ffa2]">Support</a>
+        </div>
+        <button class="px-5 py-2 rounded-full border border-white/20 text-xs font-bold hover:bg-white/10 transition">LOGIN</button>
+    </nav>
+
+    <section class="min-h-screen pt-32 px-6 flex flex-col items-center relative overflow-hidden">
+        <div class="absolute top-1/4 w-[500px] h-[500px] bg-[#00ffa2]/10 blur-[120px] rounded-full -z-10"></div>
+        
+        <div class="text-center z-10">
+            <h1 class="text-5xl md:text-8xl font-black tracking-tight leading-none mb-6">
+                IN A <span class="italic">BLINK,</span><br>IT’S <span class="neon-text">DONE.</span>
+            </h1>
+            <p class="text-gray-400 max-w-xl mx-auto mb-10 text-sm md:text-base leading-relaxed">
+                The first hyper-local task protocol built for LASUites. Secure. Cinematic. Instant. From print-outs at Gate to pro-tech gigs, bridge the gap between "Needed" and "Done."
+            </p>
+            
+            <div class="flex flex-col md:flex-row gap-4 justify-center mb-20">
+                <button class="bg-[#00ffa2] text-[#0b0e14] px-10 py-4 rounded-xl font-black text-sm tracking-widest shadow-[0_0_20px_rgba(0,255,162,0.4)]">ENTER THE NEXUS</button>
+                <button id="install-btn-hero" class="glass px-10 py-4 rounded-xl font-bold text-sm border-white/10">INSTALL APP</button>
+            </div>
+        </div>
+
+        <div class="task-card-float glass p-5 rounded-2xl w-full max-w-[320px] border-[#ffaa00]/30 relative">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-[10px] font-bold opacity-40 uppercase tracking-tighter">New Pulse</span>
+                <span class="text-[#ffaa00] text-[10px] font-black uppercase">High Urgency</span>
+            </div>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-500"></div>
+                <span class="text-sm font-bold">@BlinkMaster</span>
+            </div>
+            <p class="text-sm mb-4 font-medium italic">"Pick up 200pg document at Senate Building & deliver to Edu."</p>
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-xl font-black">₦1,200</span>
+                <div class="h-1 w-24 bg-gray-800 rounded-full overflow-hidden">
+                    <div class="h-full w-[80%] bg-[#ffaa00]"></div>
+                </div>
+            </div>
+            <button class="w-full py-2 bg-white/5 rounded-lg text-[10px] font-bold uppercase tracking-widest border border-white/10">View Details</button>
+        </div>
+    </section>
+
+    <div class="w-full glass py-4 border-y border-white/5 overflow-hidden">
+        <div class="animate-marquee">
+            <span class="mx-8 text-[10px] font-bold tracking-[0.3em] uppercase text-[#00ffa2]">LIVE PULSE: ₦42,500 Paid Today</span>
+            <span class="mx-8 text-[10px] font-bold tracking-[0.3em] uppercase text-white/40">321 Tasks Syncing</span>
+            <span class="mx-8 text-[10px] font-bold tracking-[0.3em] uppercase text-[#00ffa2]">Top Earner: @Emperor</span>
+            <span class="mx-8 text-[10px] font-bold tracking-[0.3em] uppercase text-[#00ffa2]">LIVE PULSE: ₦42,500 Paid Today</span>
+            <span class="mx-8 text-[10px] font-bold tracking-[0.3em] uppercase text-white/40">321 Tasks Syncing</span>
+        </div>
+    </div>
+
+    <section class="py-24 px-6 max-w-6xl mx-auto">
+        <h2 class="text-3xl font-black mb-12 text-center">THE <span class="neon-text">PROTOCOL</span></h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass p-8 rounded-3xl border-white/5">
+                <div class="text-[#00ffa2] mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h3 class="font-black text-lg mb-2">Academic Integrity</h3>
+                <p class="text-sm text-gray-400">No cheating, just logistics. We handle the printing and submissions; you handle the grades.</p>
+            </div>
+            <div class="glass p-8 rounded-3xl border-white/5">
+                <div class="text-[#00ffa2] mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h3 class="font-black text-lg mb-2">Fintech-Grade Security</h3>
+                <p class="text-sm text-gray-400">Verified by NIN. Secured by Mono. Every transaction locked in the Vault until you scan the Handshake QR.</p>
+            </div>
+            <div class="glass p-8 rounded-3xl border-white/5">
+                <div class="text-[#00ffa2] mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 class="font-black text-lg mb-2">Earn as You Go</h3>
+                <p class="text-sm text-gray-400">Convert your free time into Blink-Credits for Data, Airtime, and Instant Bank Cash-out.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 glass border-y border-white/5 relative overflow-hidden">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
+            <div class="flex-1">
+                <h2 class="text-4xl font-black mb-6 italic">THE <span class="neon-text">BLINK-CREDITS</span> ECONOMY</h2>
+                <p class="text-gray-400 mb-8 leading-relaxed">Stay in the top 10 on the Leaderboard to unlock "Blink King/Queen" status. Earn points for every speedy delivery and referral. Swap them instantly for what you need.</p>
+                <div class="flex gap-4">
+                    <div class="p-4 glass rounded-2xl flex flex-col items-center">
+                        <span class="text-xs font-bold opacity-50 uppercase mb-2">Airtime</span>
+                        <span class="font-black">MTN/GLO</span>
+                    </div>
+                    <div class="p-4 glass rounded-2xl flex flex-col items-center">
+                        <span class="text-xs font-bold opacity-50 uppercase mb-2">Data</span>
+                        <span class="font-black">1GB/5GB</span>
+                    </div>
+                    <div class="p-4 glass rounded-2xl flex flex-col items-center">
+                        <span class="text-xs font-bold opacity-50 uppercase mb-2">Vault</span>
+                        <span class="font-black">Cash</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 w-full max-w-[300px]">
+                <div class="glass p-6 rounded-3xl border-[#00ffa2]/20">
+                    <h4 class="text-center font-black uppercase text-xs tracking-widest mb-6">Leaderboard</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
+                            <span class="text-sm font-bold italic">1. @Emperor</span>
+                            <span class="text-[#00ffa2] font-black">12.5k</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 opacity-60">
+                            <span class="text-sm font-bold">2. @Vissionary</span>
+                            <span class="font-bold">9.2k</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 opacity-40">
+                            <span class="text-sm font-bold">3. @Blinkee_01</span>
+                            <span class="font-bold">8.8k</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-32 px-6 text-center">
+        <div class="glass max-w-4xl mx-auto p-12 md:p-20 rounded-[40px] border-[#00ffa2]/30">
+            <h2 class="text-4xl md:text-6xl font-black mb-8 leading-tight">READY TO <span class="neon-text italic">BLINK?</span></h2>
+            <p class="text-gray-400 mb-10 max-w-lg mx-auto">Add BlinkAm to your Home Screen for the full cinematic experience and real-time push notifications.</p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+                <button class="bg-[#00ffa2] text-[#0b0e14] w-full md:w-auto px-12 py-5 rounded-2xl font-black text-lg shadow-[0_0_40px_rgba(0,255,162,0.3)] hover:scale-105 transition uppercase tracking-widest">
+                    START BLINKING
+                </button>
+                <button id="install-btn-cta" class="glass w-full md:w-auto px-12 py-5 rounded-2xl font-black text-lg border-white/10 hover:bg-white/5 transition uppercase tracking-widest">
+                    INSTALL NOW
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- PWA Service Worker Registration and Install Prompt Handler -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered successfully:', registration);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // PWA Install Prompt Handler
+        let deferredPrompt;
+        const installBtnHero = document.getElementById('install-btn-hero');
+        const installBtnCta = document.getElementById('install-btn-cta');
+
+        // Listen for beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            
+            // Update UI to show install buttons are available
+            if (installBtnHero) {
+                installBtnHero.style.display = 'block';
+                installBtnHero.style.background = 'linear-gradient(135deg, #00ffa2 0%, #00cc8a 100%)';
+                installBtnHero.style.color = '#0b0e14';
+                installBtnHero.style.boxShadow = '0 0 30px rgba(0, 255, 162, 0.5)';
+            }
+            if (installBtnCta) {
+                installBtnCta.style.display = 'block';
+                installBtnCta.style.background = 'linear-gradient(135deg, #00ffa2 0%, #00cc8a 100%)';
+                installBtnCta.style.color = '#0b0e14';
+                installBtnCta.style.boxShadow = '0 0 30px rgba(0, 255, 162, 0.5)';
+            }
+        });
+
+        // Handle install button clicks
+        function handleInstallClick(e) {
+            e.preventDefault();
+            
+            // Hide the button temporarily
+            e.target.style.display = 'none';
+            
+            // Show the install prompt
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                
+                // Wait for the user to respond to the prompt
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    // Act on the user's choice
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                        // Show button again if dismissed
+                        e.target.style.display = 'block';
+                    }
+                    
+                    // Clear the deferredPrompt variable
+                    deferredPrompt = null;
+                });
+            } else {
+                // Fallback for iOS or browsers that don't support beforeinstallprompt
+                alert('To install BlinkAm:\n\n1. Tap the Share button in your browser\n2. Select "Add to Home Screen"\n3. Tap "Add" to complete installation');
+                e.target.style.display = 'block';
+            }
+        }
+
+        if (installBtnHero) {
+            installBtnHero.addEventListener('click', handleInstallClick);
+        }
+        if (installBtnCta) {
+            installBtnCta.addEventListener('click', handleInstallClick);
+        }
+
+        // Listen for app installed event
+        window.addEventListener('appinstalled', () => {
+            // Hide the install buttons
+            if (installBtnHero) {
+                installBtnHero.style.display = 'none';
+            }
+            if (installBtnCta) {
+                installBtnCta.style.display = 'none';
+            }
+            
+            // Clear the deferredPrompt
+            deferredPrompt = null;
+            console.log('BlinkAm was installed');
+        });
+    </script>
+
+</body>
+</html>
