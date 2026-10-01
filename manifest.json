@@ -1,27 +1,25 @@
 {
+  "id": "./",
   "name": "BlinkAm - The Pulse of LASU",
   "short_name": "BlinkAm",
   "description": "The first hyper-local task protocol built for LASUites. Secure. Cinematic. Instant.",
-  "start_url": "/BlinkAm_Landing_page.html",
+  "start_url": "./BlinkAm_Landing_page.html",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0b0e14",
   "theme_color": "#00ffa2",
   "orientation": "portrait",
+  "lang": "en",
   "icons": [
-    {
-      "src": "icon-192.jpg",
-      "sizes": "192x192",
-      "type": "image/jpg",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.jpg",
-      "sizes": "512x512",
-      "type": "image/jpg",
-      "purpose": "any maskable"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "categories": ["lifestyle", "productivity", "utilities"],
-  "screenshots": [],
-  "shortcuts": []
+  "shortcuts": [
+    { "name": "Create Account", "url": "./register.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Login", "url": "./log.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
 }
